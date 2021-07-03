@@ -24,7 +24,6 @@ client.connect(err => {
         const user = req.body;
         userCollection.insertOne(user)
             .then(result => {
-                console.log(result);
                 res.send(result.insertedCount > 0)
             })
     })
@@ -33,19 +32,35 @@ client.connect(err => {
     app.post('/checkEmail', (req, res) => {
         const email = req.body.email;
         const password = req.body.password;
-
         userCollection.find({ email: email })
             .toArray((err, user) => {
-                const isUser = user[0]
-                console.log(isUser);
-                if (isUser.email === email && isUser.password === password) {
-                    res.send(isUser);
+                const isUser = user
+
+                if (isUser.length > 0) {
+                    if (isUser[0].email === email && isUser[0].password === password) {
+                        res.send(isUser);
+                    } else {
+                        res.send('Password Does Not Match')
+                    }
                 } else {
-                    res.send({})
+                    res.send(false);
                 }
                 console.log(err);
             })
+
     })
+
+
+    // Delete user
+    app.delete('/deleteUser/:id', (req, res) => {
+        const id = req.params.id;
+        userCollection.findOneAndDelete({ _id: ObjectId(id) })
+            .then(results => {
+                console.log(results)
+                res.send(results.ok > 0)
+            })
+    })
+
 
     app.get('/', function (req, res) {
         res.send('hello world')
