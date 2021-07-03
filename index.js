@@ -56,8 +56,27 @@ client.connect(err => {
         const id = req.params.id;
         userCollection.findOneAndDelete({ _id: ObjectId(id) })
             .then(results => {
-                console.log(results)
                 res.send(results.ok > 0)
+            })
+    })
+
+    //update user 
+
+    app.patch('/updateInfo/:id', (req, res) => {
+        const data = req.body
+        const id = req.params.id
+        userCollection.findOneAndUpdate(
+            { _id: ObjectId(id) },
+            {
+                $set: {
+                    displayName: data.displayName,
+                    email: data.email,
+                    dateOfBirth: data.dateOfBirth,
+                    profession: data.profession,
+                }
+            })
+            .then((result) => {
+                res.send(result.ok > 0)
             })
     })
 
